@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import json
 # pip install selenium
 # pip install beautifulsoup4
 
@@ -75,14 +76,25 @@ try:
             time = event.select_one('td:nth-of-type(1)').get_text(strip=True)
             title = event.select_one('td:nth-of-type(2)').get_text(strip=True)
             game = event.select_one('td:nth-of-type(3)').get_text(strip=True)
-            platform = ''
+            channel = ''
             for span in event.select('td.channels span.channel'):
                 img = span.find('img')
                 icon_name = img['src'].split('/')[-1]
                 if icon_name in CHANNEL_MAP:
-                    platform = CHANNEL_MAP[icon_name]
+                    channel = CHANNEL_MAP[icon_name]
                     break
-            print(f"{date} | {time} | {title} | {game} | {platform}")
+                
+            print(f"{date} | {time} | {title} | {game} | {channel}")
+            json_data = {
+                'date': date,
+                'time': time,
+                'title': title,
+                'game': game,
+                'channel': channel
+            }
+            with open(f'event{type}.json', 'a', encoding='utf-8') as file:
+                json.dump(json_data, file, ensure_ascii=False, indent=4)
+                file.write('\n')
 
 except Exception as e:
     print("抓取失敗:", e)
