@@ -62,7 +62,9 @@ try:
         'channel_547_icon.svg': '體育max7台',
         'channel_548_icon.svg': '體育max8台'
     }
-    
+    file =open(f'event{type}.json', 'a', encoding='utf-8')
+    file.write('[')
+
     # 精準定位 F1 賽事（包含兩層篩選）
     all = soup.select('#programList div.contbox.belongDate')
     for Date in all:
@@ -92,10 +94,16 @@ try:
                 'game': game,
                 'channel': channel
             }
-            with open(f'event{type}.json', 'a', encoding='utf-8') as file:
-                json.dump(json_data, file, ensure_ascii=False, indent=4)
-                file.write('\n')
+            json.dump(json_data, file, ensure_ascii=False, indent=4)
+            file.write(',\n')
 
+    # 刪除最後一個逗號
+    file.seek(file.tell() - 3, 0)  # Move the cursor to the second last position
+    file.truncate()  # Truncate the file to remove the last comma
+    file.write(']')
+    # Close the JSON array
+    file.close()
+    #close the json file
 except Exception as e:
     print("抓取失敗:", e)
 finally:
