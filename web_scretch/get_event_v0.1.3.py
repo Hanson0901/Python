@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import json
 import datetime
+import os
 # pip install selenium
 # pip install beautifulsoup4
 
@@ -63,10 +64,27 @@ try:
         'channel_547_icon.svg': '體育max7台',
         'channel_548_icon.svg': '體育max8台'
     }
-    file =open(f'event{type}.json', 'a', encoding='utf-8')
-    file.write('[')
 
-    # 精準定位 F1 賽事（包含兩層篩選）
+    #os.makedirs('web_scretch', exist_ok=True)
+    os.makedirs('web_scretch/data', exist_ok=True)
+    filename = f'web_scretch/data/event{type}.json'
+    if os.path.exists(filename):
+        with open(filename, 'r', encoding='utf-8') as f:
+            first_char = f.read(1)
+    else:
+        first_char = ''
+
+    file = open(filename, 'a', encoding='utf-8')
+
+    if first_char != '[':
+        file.write("[")
+        file.seek(1)
+    else:
+    # 讓指針指向倒數第2個字（這裡你可能需要根據需求調整）
+        file.seek(file.tell() - 1, 0)
+        file.truncate()
+        file.write(',\n')
+    
     all = soup.select('#programList div.contbox.belongDate')
     print("檢查匯入的資料")
 
@@ -102,8 +120,8 @@ try:
 
     # 刪除最後一個逗號
     file.seek(file.tell() - 3, 0)  # Move the cursor to the second last position
-    file.truncate()  # Truncate the file to remove the last comma
-    file.write(']')
+    file.truncate()  # 刪掉至最後
+    file.write(']') #補回或新增一個]，讓json檔案結束
     # Close the JSON array
     file.close()
     #close the json file
